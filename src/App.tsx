@@ -1,24 +1,69 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+import Main from "./components/Main";
+import Category from "./components/Category";
+import Layout from "./components/Layout";
+
+import { ICategory, ITodo } from "./interfaces";
+
+require("./index.css");
 
 function App() {
+  const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+  const [allTodos, setAllTodos] = useState<ITodo[]>([]);
+
+  useEffect(() => {
+    const savedCategories = localStorage.getItem("savedCategories");
+    if (savedCategories) {
+      setAllCategories(JSON.parse(savedCategories));
+    }
+
+    const savedTodos = localStorage.getItem("savedTodos");
+    if (savedTodos) {
+      setAllTodos(JSON.parse(savedTodos));
+    }
+  }, []);
+
+  console.log(allTodos);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="wrapper">
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Layout
+              allCategories={allCategories}
+              setAllCategories={setAllCategories}
+            />
+          }
         >
-          Learn React
-        </a>
-      </header>
+          <Route
+            index
+            element={
+              <Main
+                allCategories={allCategories}
+                setAllCategories={setAllCategories}
+                allTodos={allTodos}
+                setAllTodos={setAllTodos}
+              />
+            }
+          />
+
+          <Route
+            path="/:categoryId"
+            element={
+              <Category
+                allCategories={allCategories}
+                setAllCategories={setAllCategories}
+                allTodos={allTodos}
+                setAllTodos={setAllTodos}
+              />
+            }
+          />
+        </Route>
+      </Routes>
     </div>
   );
 }
