@@ -42,3 +42,8 @@ main {
   background-color: #fa7572;
   color: white;
 }
+
+.category-header {
+  display: flex;
+  flex-direction: row;
+}
