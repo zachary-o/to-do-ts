@@ -20,7 +20,6 @@
 aside {
   width: 30%;
   background-color: #f3f3f3;
-  
 }
 
 main {
@@ -46,4 +45,19 @@ main {
 .category-header {
   display: flex;
   flex-direction: row;
+}
+
+.category-color {
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  margin: 5px;
+}
+
+.colors-palette {
+  display: flex;
+  flex-direction: row;
+  width: 200px;
+  height: 30px;
+  background-color: #f3f3f3;
 }

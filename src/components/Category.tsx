@@ -14,12 +14,20 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
 }) => {
   const [editTaskId, setEditTaskId] = useState<string>("");
   const [oldTaskName, setOldTaskName] = useState<string>("");
+  const [isColorsActive, setIsColorsActive] = useState<boolean>(false);
 
   const { categoryId } = useParams();
   const navigate = useNavigate();
   const currentCategory = allCategories.find(
     (category) => category.categoryId === categoryId
   );
+  const categoryColors: string[] = [
+    "#FF6868",
+    "#FED568",
+    "#74FF68",
+    "#67C9FF",
+    "#A168FF",
+  ];
 
   const handleDeleteCategory = () => {
     const updatedTodos = allTodos.filter(
@@ -73,6 +81,7 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
     localStorage.setItem("savedTodos", JSON.stringify(updatedTodos));
   };
 
+  console.log(isColorsActive);
   return (
     <main>
       <div className="category-header">
@@ -82,6 +91,22 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
           size={18}
           onClick={() => handleDeleteCategory()}
         />
+        <p
+          className="category-color"
+          onClick={() => setIsColorsActive(true)}
+          style={{ backgroundColor: currentCategory?.color }}
+        ></p>
+        {isColorsActive && (
+          <div className="colors-palette">
+            {categoryColors.map((color, index) => (
+              <p
+                className="category-color"
+                key={index}
+                style={{ backgroundColor: color }}
+              ></p>
+            ))}
+          </div>
+        )}
       </div>
       <NewTodoInput
         allCategories={allCategories}
