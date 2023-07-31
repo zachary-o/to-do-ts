@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import Main from "./components/Main";
 import Category from "./components/Category";
 import Layout from "./components/Layout";
-
 import { ICategory, ITodo } from "./interfaces";
 
 require("./index.css");
@@ -24,8 +23,6 @@ function App() {
       setAllTodos(JSON.parse(savedTodos));
     }
   }, []);
-
-  console.log(allTodos);
 
   return (
     <div className="wrapper">

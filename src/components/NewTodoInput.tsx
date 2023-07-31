@@ -6,7 +6,6 @@ import { nanoid } from "nanoid";
 
 const NewTodoInput: FC<ICategoryProps & ITodoProps> = ({
   allCategories,
-  setAllCategories,
   allTodos,
   setAllTodos,
 }) => {
@@ -37,14 +36,18 @@ const NewTodoInput: FC<ICategoryProps & ITodoProps> = ({
   };
 
   return (
-    <div>
+    <div className="todo-input-container">
       <form onSubmit={handleSaveTodo}>
         <input
           type="text"
           onChange={(event) => setTodoInput(event.target.value)}
           value={todoInput}
+          className="new-todo-input"
+          maxLength={60}
         />
-        <button type="submit">+</button>
+        <button type="submit" className="add-todo-button">
+          +
+        </button>
       </form>
     </div>
   );

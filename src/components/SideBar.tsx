@@ -1,4 +1,4 @@
-import { FC, FormEvent, useState } from "react";
+import { FC, FormEvent, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { nanoid } from "nanoid";
@@ -8,8 +8,10 @@ import { ICategoryProps } from "../interfaces";
 const SideBar: FC<ICategoryProps> = ({ allCategories, setAllCategories }) => {
   const [isActiveInput, setIsActiveInput] = useState(false);
   const [categoryInput, setCategoryInput] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string>("");
 
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSaveCategory = (event: FormEvent) => {
     event.preventDefault();
@@ -28,6 +30,7 @@ const SideBar: FC<ICategoryProps> = ({ allCategories, setAllCategories }) => {
     });
     setCategoryInput("");
     setIsActiveInput(false);
+    setActiveCategory(newCategory.categoryId);
     localStorage.setItem(
       "savedCategories",
       JSON.stringify([...allCategories, newCategory])
@@ -35,31 +38,62 @@ const SideBar: FC<ICategoryProps> = ({ allCategories, setAllCategories }) => {
     navigate(`/${newCategory.categoryId}`);
   };
 
+  useEffect(() => {
+    if (isActiveInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isActiveInput]);
+
   return (
     <aside>
-      <h1 onClick={() => navigate("/")}>All tasks</h1>
+      <h1
+        onClick={() => {
+          navigate("/");
+          setIsActiveInput(false);
+          setActiveCategory("");
+        }}
+        style={{
+          fontWeight: activeCategory === "" ? "600" : "400",
+        }}
+      >
+        All tasks
+      </h1>
       <div className="categories-list">
         {allCategories?.map((category) => (
           <h2
             key={category.categoryId}
-            onClick={() => navigate(`/${category.categoryId}`)}
+            onClick={() => {
+              navigate(`/${category.categoryId}`);
+              setIsActiveInput(false);
+              setActiveCategory(category.categoryId);
+            }}
+            style={{
+              fontWeight:
+                activeCategory === category.categoryId ? "600" : "400",
+            }}
           >
             {category.name}
           </h2>
         ))}
       </div>
-      <div>
+      <div className="category-input-container">
         {isActiveInput ? (
           <form onSubmit={handleSaveCategory}>
             <input
               type="text"
+              ref={inputRef}
               onChange={(event) => setCategoryInput(event.target.value)}
               value={categoryInput}
+              className="category-input"
+              placeholder="Enter category name"
+              maxLength={20}
             />
-            <button type="submit">+</button>
+            <button type="submit" className="add-category-button">
+              +
+            </button>
           </form>
         ) : (
-          <p onClick={() => setIsActiveInput(true)}>+ New category</p>
+          <p onClick={() => setIsActiveInput(true)} className="new-category">+ New category</p>
         )}
       </div>
     </aside>

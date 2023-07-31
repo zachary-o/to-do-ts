@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+body {
+  font-family: "Roboto", sans-serif;
+}
+
 .wrapper {
   width: 97%;
   max-width: 1440px;
@@ -17,37 +21,96 @@
   min-height: 100vh;
 }
 
+/* LEFT SIDE */
+
 aside {
   width: 30%;
   background-color: #f3f3f3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 40px;
+  gap: 10px;
 }
+
+aside > h1 {
+  cursor: pointer;
+}
+
+.categories-list > h2 {
+  font-size: 18px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.new-category {
+  color: #bdbdbd;
+  cursor: pointer;
+}
+
+.category-input-container {
+  margin-top: 40px;
+  position: relative;
+}
+
+.category-input {
+  width: 237px;
+  height: 40px;
+  border: 2px solid #bdbdbd;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.category-input:focus {
+  outline: #bdbdbd;
+}
+
+.add-category-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  border: none;
+  background-color: #bdbdbd;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* RIGHT SIDE */
 
 main {
-  padding: 20px;
+  padding: 40px;
   width: 70%;
-  background-color: antiquewhite;
+  background-color: #f3f3f381;
 }
 
-.todo {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  gap: 15px;
-}
-
-.todo > span {
-  padding: 5px 10px;
-  border-radius: 7.5px;
-  background-color: #fa7572;
-  color: white;
+main > h1 {
+  margin-bottom: 15px;
 }
 
 .category-header {
+  width: 330px;
   display: flex;
   flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.category-header > * {
+  margin-right: 16px;
+}
+
+.icon {
+  color: #bdbdbd;
+  cursor: pointer;
 }
 
 .category-color {
+  cursor: pointer;
   height: 20px;
   width: 20px;
   border-radius: 50px;
@@ -55,9 +118,171 @@ main {
 }
 
 .colors-palette {
+  position: absolute;
+  top: 50%;
+  left: 210px;
+  transform: translateY(-50%);
+  border-radius: 5px;
   display: flex;
   flex-direction: row;
-  width: 200px;
+  width: 150px;
   height: 30px;
-  background-color: #f3f3f3;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+/* TODO INPUT */
+
+.todo-input-container {
+  position: relative;
+}
+
+.new-todo-input {
+  width: 237px;
+  height: 40px;
+  border: 2px solid #bdbdbd;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.new-todo-input:focus {
+  outline: #bdbdbd;
+}
+
+.add-todo-button {
+  position: absolute;
+  top: 50%;
+  left: 200px;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  border: none;
+  background-color: #bdbdbd;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* TODO ITEM */
+
+.todos {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.todo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  margin-top: 10px;
+  width: 500px;
+}
+
+.checkmark-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.todo input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* CUSTOM CHECKMARK */
+
+.checkmark {
+  position: absolute;
+  top: -7px;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+}
+
+.checkmark-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+.checkmark-container input:checked ~ .checkmark {
+  background-color: #4bef26;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkmark-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkmark-container .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+/* CUSTOM DROPDOWN */
+
+.dropdown-container {
+  width: 200px;
+  user-select: none;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.dropdown-container > .dropdown-button {
+  padding: 10px;
+  background: #bdbdbd;
+  box-shadow: 3px 3px 10px 6px rgba(0, 0, 0, 0.06);
+  font-weight: 400;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.dropdown-container > .dropdown-content {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  padding: 10px;
+  background: #f3f3f3;
+  box-shadow: 3px 3px 10px 6px rgba(0, 0, 0, 0.06);
+  font-weight: 400;
+  color: #000;
+  width: 100%;
+}
+
+.dropdown-container > .dropdown-content > .dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown-container > .dropdown-content > .dropdown-item:hover {
+  background-color: #bdbdbd;
 }

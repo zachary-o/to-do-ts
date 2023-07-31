@@ -1,8 +1,7 @@
-import { FC, FormEvent, useState } from "react";
+import { FC, useState, useRef, useEffect } from "react";
 import NewTodoInput from "./NewTodoInput";
+import TodoItem from "./TodoItem";
 import { ICategoryProps, ITodoProps } from "../interfaces";
-
-import { Pencil, TrashCan } from "akar-icons";
 
 const Main: FC<ICategoryProps & ITodoProps> = ({
   allCategories,
@@ -10,43 +9,15 @@ const Main: FC<ICategoryProps & ITodoProps> = ({
   allTodos,
   setAllTodos,
 }) => {
-  const [editTaskId, setEditTaskId] = useState<string>("");
-  const [oldTaskName, setOldTaskName] = useState<string>("");
+  const [isActiveInput, setIsActiveInput] = useState<boolean>(false);
 
-  const handleDeleteTask = (taskId: string) => {
-    const updatedTodos = allTodos.filter((todo) => todo.taskId !== taskId);
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
-  };
+  const todoRef = useRef<HTMLInputElement>(null);
 
-  const handleEditTask = (taskId: string) => {
-    const editableTask = allTodos.find((todo) => todo.taskId === taskId);
-    if (editableTask) {
-      setOldTaskName(editableTask.taskName);
-      setEditTaskId(taskId);
+  useEffect(() => {
+    if (isActiveInput && todoRef.current) {
+      todoRef.current.focus();
     }
-  };
-
-  const handleTaskNameChange = (event: FormEvent<HTMLInputElement>) => {
-    const newTaskName = event.currentTarget.value;
-    setOldTaskName(newTaskName);
-
-    const updatedTodos = allTodos.map((todo) =>
-      todo.taskId === editTaskId ? { ...todo, taskName: newTaskName } : todo
-    );
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
-  };
-
-  const handleTaskCheckbox = (taskId: string) => {
-    const updatedTodos = allTodos.map((todo) =>
-      todo.taskId === taskId
-        ? { ...todo, isCompleted: !todo.isCompleted }
-        : todo
-    );
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify(updatedTodos));
-  };
+  }, [isActiveInput]);
 
   return (
     <main>
@@ -59,36 +30,14 @@ const Main: FC<ICategoryProps & ITodoProps> = ({
       />
       <div className="todos">
         {allTodos.map((todo) => (
-          <div key={todo.taskId} className="todo">
-            <input
-              type="checkbox"
-              onChange={() => handleTaskCheckbox(todo.taskId)}
-              checked={todo.isCompleted}
-              readOnly
-            />
-            {editTaskId === todo.taskId ? (
-              <form>
-                <input
-                  type="text"
-                  value={oldTaskName}
-                  onChange={handleTaskNameChange}
-                />
-              </form>
-            ) : (
-              <p>{todo.taskName}</p>
-            )}
-            {todo.categoryName && <span>{todo.categoryName}</span>}
-            <Pencil
-              strokeWidth={2}
-              size={18}
-              onClick={() => handleEditTask(todo.taskId)}
-            />
-            <TrashCan
-              strokeWidth={2}
-              size={18}
-              onClick={() => handleDeleteTask(todo.taskId)}
-            />
-          </div>
+          <TodoItem
+            key={todo.taskId}
+            allTodos={allTodos}
+            setAllTodos={setAllTodos}
+            allCategories={allCategories}
+            setAllCategories={setAllCategories}
+            {...todo}
+          />
         ))}
       </div>
     </main>

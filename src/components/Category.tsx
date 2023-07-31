@@ -1,10 +1,11 @@
-import { FC, FormEvent, useState } from "react";
+import { FC, useRef, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import NewTodoInput from "./NewTodoInput";
+import TodoItem from "./TodoItem";
 import { ICategoryProps, ITodoProps } from "../interfaces";
 
-import { Pencil, TrashCan } from "akar-icons";
+import { TrashCan } from "akar-icons";
 
 const Category: FC<ICategoryProps & ITodoProps> = ({
   allCategories,
@@ -12,15 +13,10 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
   allTodos,
   setAllTodos,
 }) => {
-  const [editTaskId, setEditTaskId] = useState<string>("");
-  const [oldTaskName, setOldTaskName] = useState<string>("");
-  const [isColorsActive, setIsColorsActive] = useState<boolean>(false);
-
   const { categoryId } = useParams();
   const navigate = useNavigate();
-  const currentCategory = allCategories.find(
-    (category) => category.categoryId === categoryId
-  );
+  const colorsPaletteRef = useRef<HTMLDivElement>(null);
+
   const categoryColors: string[] = [
     "#FF6868",
     "#FED568",
@@ -28,6 +24,11 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
     "#67C9FF",
     "#A168FF",
   ];
+  let currentCategory = allCategories.find(
+    (category) => category.categoryId === categoryId
+  );
+
+  const [isColorsActive, setIsColorsActive] = useState<boolean>(false);
 
   const handleDeleteCategory = () => {
     const updatedTodos = allTodos.filter(
@@ -46,63 +47,74 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
     navigate("/");
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    const updatedTodos = allTodos.filter((todo) => todo.taskId !== taskId);
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
-  };
-
-  const handleEditTask = (taskId: string) => {
-    const editableTask = allTodos.find((todo) => todo.taskId === taskId);
-    if (editableTask) {
-      setOldTaskName(editableTask.taskName);
-      setEditTaskId(taskId);
+  const setCategoryColor = (color: string) => {
+    if (currentCategory) {
+      const updatedCategories = allCategories.map((category) => {
+        if (category.name === currentCategory?.name) {
+          return {
+            ...category,
+            color,
+          };
+        }
+        return category;
+      });
+      setAllCategories(updatedCategories);
+      localStorage.setItem(
+        "savedCategories",
+        JSON.stringify(updatedCategories)
+      );
     }
+    setIsColorsActive(false);
   };
 
-  const handleTaskNameChange = (event: FormEvent<HTMLInputElement>) => {
-    const newTaskName = event.currentTarget.value;
-    setOldTaskName(newTaskName);
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        isColorsActive &&
+        colorsPaletteRef.current &&
+        !colorsPaletteRef.current.contains(event.target as Node) &&
+        !(event.target as HTMLElement).classList.contains("category-color")
+      ) {
+        setIsColorsActive(false);
+      }
+    };
 
-    const updatedTodos = allTodos.map((todo) =>
-      todo.taskId === editTaskId ? { ...todo, taskName: newTaskName } : todo
-    );
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
-  };
+    document.addEventListener("mousedown", handleOutsideClick);
 
-  const handleTaskCheckbox = (taskId: string) => {
-    const updatedTodos = allTodos.map((todo) =>
-      todo.taskId === taskId
-        ? { ...todo, isCompleted: !todo.isCompleted }
-        : todo
-    );
-    setAllTodos(updatedTodos);
-    localStorage.setItem("savedTodos", JSON.stringify(updatedTodos));
-  };
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isColorsActive]);
 
-  console.log(isColorsActive);
+  useEffect(() => {
+    if (!currentCategory) {
+      navigate("/");
+    }
+  }, []);
+
   return (
     <main>
       <div className="category-header">
         <h1>{currentCategory?.name}</h1>
         <TrashCan
           strokeWidth={2}
-          size={18}
+          size={20}
           onClick={() => handleDeleteCategory()}
+          className="icon"
         />
         <p
           className="category-color"
-          onClick={() => setIsColorsActive(true)}
+          onClick={() => setIsColorsActive((prev) => !prev)}
           style={{ backgroundColor: currentCategory?.color }}
         ></p>
         {isColorsActive && (
-          <div className="colors-palette">
+          <div ref={colorsPaletteRef} className="colors-palette">
             {categoryColors.map((color, index) => (
               <p
                 className="category-color"
                 key={index}
                 style={{ backgroundColor: color }}
+                onClick={() => setCategoryColor(color)}
               ></p>
             ))}
           </div>
@@ -118,37 +130,15 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
         {allTodos
           .filter((todo) => todo.categoryName === currentCategory?.name)
           .map((todo) => (
-            <div key={todo.taskId} className="todo">
-              <input
-                type="checkbox"
-                onChange={() => handleTaskCheckbox(todo.taskId)}
-                checked={todo.isCompleted}
-                readOnly
-              />
-              {editTaskId === todo.taskId ? (
-                <form>
-                  <input
-                    type="text"
-                    value={oldTaskName}
-                    onChange={handleTaskNameChange}
-                  />
-                </form>
-              ) : (
-                <p>{todo.taskName}</p>
-              )}
-
-              {todo.categoryName && <span>{todo.categoryName}</span>}
-              <Pencil
-                strokeWidth={2}
-                size={18}
-                onClick={() => handleEditTask(todo.taskId)}
-              />
-              <TrashCan
-                strokeWidth={2}
-                size={18}
-                onClick={() => handleDeleteTask(todo.taskId)}
-              />
-            </div>
+            <TodoItem
+              key={todo.taskId}
+              allTodos={allTodos}
+              setAllTodos={setAllTodos}
+              allCategories={allCategories}
+              setAllCategories={setAllCategories}
+              currentCategory={currentCategory}
+              {...todo}
+            />
           ))}
       </div>
     </main>
