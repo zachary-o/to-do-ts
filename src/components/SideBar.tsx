@@ -71,6 +71,7 @@ const SideBar: FC<ICategoryProps> = ({ allCategories, setAllCategories }) => {
               fontWeight:
                 activeCategory === category.categoryId ? "600" : "400",
             }}
+            className="category-name"
           >
             {category.name}
           </h2>
@@ -86,14 +87,16 @@ const SideBar: FC<ICategoryProps> = ({ allCategories, setAllCategories }) => {
               value={categoryInput}
               className="category-input"
               placeholder="Enter category name"
-              maxLength={20}
+              maxLength={30}
             />
             <button type="submit" className="add-category-button">
               +
             </button>
           </form>
         ) : (
-          <p onClick={() => setIsActiveInput(true)} className="new-category">+ New category</p>
+          <p onClick={() => setIsActiveInput(true)} className="new-category">
+            + New category
+          </p>
         )}
       </div>
     </aside>

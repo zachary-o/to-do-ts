@@ -40,6 +40,7 @@ const NewTodoInput: FC<ICategoryProps & ITodoProps> = ({
       <form onSubmit={handleSaveTodo}>
         <input
           type="text"
+          placeholder="Add new task"
           onChange={(event) => setTodoInput(event.target.value)}
           value={todoInput}
           className="new-todo-input"

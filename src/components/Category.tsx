@@ -102,23 +102,25 @@ const Category: FC<ICategoryProps & ITodoProps> = ({
           onClick={() => handleDeleteCategory()}
           className="icon"
         />
-        <p
-          className="category-color"
-          onClick={() => setIsColorsActive((prev) => !prev)}
-          style={{ backgroundColor: currentCategory?.color }}
-        ></p>
-        {isColorsActive && (
-          <div ref={colorsPaletteRef} className="colors-palette">
-            {categoryColors.map((color, index) => (
-              <p
-                className="category-color"
-                key={index}
-                style={{ backgroundColor: color }}
-                onClick={() => setCategoryColor(color)}
-              ></p>
-            ))}
-          </div>
-        )}
+        <div className="header-color-select">
+          <p
+            className="category-color"
+            onClick={() => setIsColorsActive((prev) => !prev)}
+            style={{ backgroundColor: currentCategory?.color }}
+          ></p>
+          {isColorsActive && (
+            <div ref={colorsPaletteRef} className="colors-palette">
+              {categoryColors.map((color, index) => (
+                <p
+                  className="category-color"
+                  key={index}
+                  style={{ backgroundColor: color }}
+                  onClick={() => setCategoryColor(color)}
+                ></p>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       <NewTodoInput
         allCategories={allCategories}

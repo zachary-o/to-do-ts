@@ -1,6 +1,6 @@
 import { FC, FormEvent, useState, useRef, useEffect } from "react";
 
-import { Pencil, TrashCan } from "akar-icons";
+import { Pencil, Save, TrashCan } from "akar-icons";
 import { ICategory, ITodo } from "../interfaces";
 
 interface ITodoItem {
@@ -30,11 +30,15 @@ const TodoItem: FC<ITodoItem> = ({
 
   const todoRef = useRef<HTMLInputElement>(null);
 
+  //   DELETE TASK FUNCTION
+
   const handleDeleteTask = (taskId: string) => {
     const updatedTodos = allTodos.filter((todo) => todo.taskId !== taskId);
     setAllTodos(updatedTodos);
     localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
   };
+
+  // EDIT TASK FUNCTION
 
   const handleEditTask = (taskId: string) => {
     const editableTask = allTodos.find((todo) => todo.taskId === taskId);
@@ -45,6 +49,8 @@ const TodoItem: FC<ITodoItem> = ({
     }
   };
 
+  // CHECKBOX FUNCTION
+
   const handleTaskCheckbox = (taskId: string) => {
     const updatedTodos = allTodos.map((todo) =>
       todo.taskId === taskId
@@ -54,6 +60,8 @@ const TodoItem: FC<ITodoItem> = ({
     setAllTodos(updatedTodos);
     localStorage.setItem("savedTodos", JSON.stringify(updatedTodos));
   };
+
+  // SAVE NEW TASK NAME FUNCTION
 
   const handleTaskNameChange = (event: FormEvent<HTMLInputElement>) => {
     const newTaskName = event.currentTarget.value;
@@ -66,6 +74,8 @@ const TodoItem: FC<ITodoItem> = ({
     localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
   };
 
+  // SAVE NEW TASK CATEGORY FUNCTION
+
   const handleCategoryChange = (event: string) => {
     const selectedCategoryName = event;
     const updatedTodos = allTodos.map((todo) =>
@@ -77,6 +87,8 @@ const TodoItem: FC<ITodoItem> = ({
     localStorage.setItem("savedTodos", JSON.stringify([...updatedTodos]));
   };
 
+  // TASK'S CATEGORY COLOR FUNCTION
+
   const categoryColor = () => {
     const neededTask = allTodos.find((todo) => todo.taskId === taskId);
     const neededColor = allCategories.find(
@@ -85,68 +97,106 @@ const TodoItem: FC<ITodoItem> = ({
     return neededColor?.color;
   };
 
+  // ACTIVE INPUT FOCUS
   useEffect(() => {
-    todoRef.current?.focus();
+    if (isActiveInput) {
+      todoRef.current?.focus();
+    }
   }, [isActiveInput]);
 
   console.log(allTodos);
 
   return (
+    // CHECKMARK
     <div key={taskId} className="todo">
-      <label className="checkmark-container">
-        <input
-          type="checkbox"
-          onChange={() => handleTaskCheckbox(taskId)}
-          checked={isCompleted}
-          readOnly
-        />
-        <span className="checkmark"></span>
-      </label>
-
-      {editTaskId === taskId ? (
-        <form>
+      <div className="checkmark-taskname-container">
+        <label className="checkmark-container">
           <input
-            type="text"
-            ref={todoRef}
-            value={oldTaskName}
-            onChange={handleTaskNameChange}
+            type="checkbox"
+            onChange={() => handleTaskCheckbox(taskId)}
+            checked={isCompleted}
+            readOnly
           />
-        </form>
-      ) : (
-        <p>{taskName}</p>
-      )}
+          <span className="checkmark"></span>
+        </label>
 
-      {categoryName && (
-        <div>
-          <span style={{ backgroundColor: categoryColor() }}>
-            {categoryName}
-          </span>
-          {isActiveInput && (
-            <select
-              value={categoryName}
-              onChange={(event) => handleCategoryChange(event.target.value)}
+        {/* EDIT TASK INPUT */}
+        {isActiveInput ? (
+          <form>
+            <input
+              type="text"
+              spellCheck="false"
+              ref={todoRef}
+              value={oldTaskName}
+              onChange={handleTaskNameChange}
+              className="edit-todo-input"
+            />
+          </form>
+        ) : (
+          <p className="taskname">{taskName}</p>
+        )}
+      </div>
+
+      <div className="category-icons-container">
+        {" "}
+        {/* SINGLE TASK CATEGORY */}
+        {categoryName && (
+          <div>
+            <span
+              style={{ backgroundColor: categoryColor() }}
+              className="todo-category-color"
             >
-              {allCategories.map((category) => (
-                <option value={category.name} key={category.categoryId}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+              {categoryName.length > 10
+                ? `${categoryName.slice(0, 10)}...`
+                : categoryName}
+            </span>
+
+            {/* CATEGORY DROPDOWN */}
+            {isActiveInput && (
+              <select
+                className="dropdown"
+                value={categoryName}
+                onChange={(event) => handleCategoryChange(event.target.value)}
+              >
+                {allCategories.map((category) => (
+                  <option
+                    value={category.name}
+                    key={category.categoryId}
+                    className="option"
+                  >
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+        {/* ICONS */}
+        <div className="icons-container">
+          {" "}
+          {isActiveInput ? (
+            <Save
+              strokeWidth={2}
+              size={18}
+              className="icon"
+              onClick={() => setIsActiveInput(false)}
+            />
+          ) : (
+            <Pencil
+              strokeWidth={2}
+              size={18}
+              onClick={() => handleEditTask(taskId)}
+              className="icon"
+            />
           )}
+          <TrashCan
+            strokeWidth={2}
+            size={18}
+            onClick={() => handleDeleteTask(taskId)}
+            className="icon"
+          />
         </div>
-      )}
-      <Pencil
-        strokeWidth={2}
-        size={18}
-        onClick={() => handleEditTask(taskId)}
-        className="icon"
-      />
-      <TrashCan
-        strokeWidth={2}
-        size={18}
-        onClick={() => handleDeleteTask(taskId)}
-        className="icon"
-      />
+      </div>
     </div>
   );
 };
